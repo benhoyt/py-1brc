@@ -1,4 +1,4 @@
-# Split into chunks and process in parallel with thread pool
+# Split into chunks and process in parallel with process pool (to get around the GIL)
 
 from dataclasses import dataclass
 import multiprocessing.pool, os, sys, time
@@ -76,7 +76,7 @@ def main(path):
     num_cpus = os.cpu_count()
     args = [(path, offset, size) for offset, size in get_parts(path, num_cpus)]
 
-    with multiprocessing.pool.ThreadPool(num_cpus) as p:
+    with multiprocessing.pool.Pool(num_cpus) as p:
         results = p.map(process_chunk, args)
 
     totals = merge_results(results)
@@ -85,6 +85,6 @@ def main(path):
 
     elapsed = time.time() - start
     total_size = os.path.getsize(path)
-    print(f'Processed {total_size/(1024*1024):.1f}MB in {elapsed*1000:.3f}ms using {num_cpus} threads', file=sys.stderr)
+    print(f'Processed {total_size/(1024*1024):.1f}MB in {elapsed*1000:.3f}ms on {num_cpus} cores', file=sys.stderr)
 
 main(sys.argv[1])

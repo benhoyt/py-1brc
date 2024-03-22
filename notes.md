@@ -8,11 +8,55 @@ Tentative plan:
 - r6: multiprocessing
 
 Notes:
+- putting things in a function helped big-time! at least on Python 3.10 (try on 3.12)
 - Brian's DuckDB + ChatGPT tool
 - microoptimizations don't help much (anymore?), like assigning globals to local vars
 - map, ThreadPool.map, Pool.map
 - some way to show what GIL is doing?
 - show Python 3.10 to Python 3.12 speed differences -- significant!
+- reading large chunks as bytes/bytearray and then using .find(b';') and .find(b'\n') didn't help
+  -> too many operations
+- "if" statement much faster than min/max! (do a dis() to show: fewer opcodes doesn't necessarily mean faster)
+- floats[temp_str] dict lookup a bit faster than float(temp_str)
+- try/except KeyError is a bit faster than stats.get and "if v is None"
+- note that r5 and r6 are Map Reduce
+
+```
+# TODO: show timeit of float(temp_str) vs floats[temp_str]
+```
+
+```
+0 ~/h/py-1brc$ python3 -m timeit -s 's = "Auckland;34.0"' 'x, y = s.split(";")'
+5000000 loops, best of 5: 55.6 nsec per loop
+0 ~/h/py-1brc$ python3 -m timeit -s 's = "Auckland;34.0"' 'x, _, y = s.partition(";")'
+10000000 loops, best of 5: 40.6 nsec per loop
+```
+
+```
+# Useful use of dis.dis() -- BINARY_SUBSCR a bit faster than CALL
+>>> import dis
+>>> def f1(s):
+...  return float(s)
+... 
+>>> floats = {str(i/10)+'\n': i/10 for i in range(-999, 1000)}
+>>> def f2(s):
+...  return floats[s]
+... 
+>>> dis.dis(f1)
+  1           0 RESUME                   0
+
+  2           2 LOAD_GLOBAL              1 (NULL + float)
+             12 LOAD_FAST                0 (s)
+             14 CALL                     1
+             22 RETURN_VALUE
+>>> dis.dis(f2)
+  1           0 RESUME                   0
+
+  2           2 LOAD_GLOBAL              0 (floats)
+             12 LOAD_FAST                0 (s)
+             14 BINARY_SUBSCR
+             18 RETURN_VALUE
+```
 
 DuckDB query:
 
