@@ -22,6 +22,7 @@ def process_chunk(path_offset_size):
         for line in f:
             station, _, temp_str = line.partition(b';')
             temp = floats[temp_str]
+
             try:
                 s = stats[station]
                 if temp < s.min:
@@ -76,8 +77,8 @@ def main(path):
     num_cpus = os.cpu_count()
     args = [(path, offset, size) for offset, size in get_parts(path, num_cpus)]
 
-    with multiprocessing.pool.ThreadPool(num_cpus) as p:
-        results = p.map(process_chunk, args)
+    with multiprocessing.pool.ThreadPool(num_cpus) as pool:
+        results = pool.map(process_chunk, args)
 
     totals = merge_results(results)
     for station, s in sorted(totals.items()):

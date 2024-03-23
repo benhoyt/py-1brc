@@ -15,13 +15,14 @@ class Stat:
 def main():
     stats = {}
     with open(sys.argv[1]) as f:
-        for row in csv.reader(f, delimiter=';'):
-            station, temp_str = row
+        for station, temp_str in csv.reader(f, delimiter=';'):
             temp = float(temp_str)
+
             s = stats.get(station)
             if s is None:
                 stats[station] = Stat(min=temp, max=temp, sum=temp, count=1)
                 continue
+
             s.min = min(s.min, temp)
             s.max = max(s.max, temp)
             s.sum += temp

@@ -11,15 +11,15 @@ class Stat:
     sum: float
     count: float
 
-floats = {str(i/10)+'\n': i/10 for i in range(-999, 1000)}
-
 @profile
 def main():
+    floats = {str(i/10)+'\n': i/10 for i in range(-999, 1000)}
     stats = {}
     with open(sys.argv[1]) as f:
         for line in f:
             station, _, temp_str = line.partition(';')
             temp = floats[temp_str]
+
             try:
                 s = stats[station]
                 if temp < s.min:

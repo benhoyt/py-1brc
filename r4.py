@@ -18,10 +18,12 @@ def main():
         for line in f:
             station, _, temp_str = line.partition(';')
             temp = float(temp_str)
+
             s = stats.get(station)
             if s is None:
                 stats[station] = Stat(min=temp, max=temp, sum=temp, count=1)
                 continue
+
             s.min = min(s.min, temp)
             s.max = max(s.max, temp)
             s.sum += temp

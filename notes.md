@@ -2,20 +2,22 @@ Tentative plan:
 
 - r1: process char by char
 - r2: re.match(r'([^;]+);([-.0-9])', line)
-- r4: csv
-- r3: line.partition(';')
-- r5: thread pool / threading
-- r6: multiprocessing
+- r3: csv
+- r4: line.partition(';')
+- r5: micro-optimized r4
+- r6: thread pool
+- r7: process pool
 
 Notes:
-- putting things in a function helped big-time! at least on Python 3.10 (try on 3.12)
 - Brian's DuckDB + ChatGPT tool
-- microoptimizations don't help much (anymore?), like assigning globals to local vars
+
+- putting things in a main function helped big-time! at least on Python 3.10 (try on 3.12)
+- some microoptimizations don't help much (anymore?), like assigning globals to local vars
 - map, ThreadPool.map, Pool.map
 - some way to show what GIL is doing?
 - show Python 3.10 to Python 3.12 speed differences -- significant!
 - reading large chunks as bytes/bytearray and then using .find(b';') and .find(b'\n') didn't help
-  -> too many operations
+  -> just too many operations
 - "if" statement much faster than min/max! (do a dis() to show: fewer opcodes doesn't necessarily mean faster)
 - floats[temp_str] dict lookup a bit faster than float(temp_str)
 - try/except KeyError is a bit faster than stats.get and "if v is None"
@@ -61,10 +63,11 @@ Notes:
 DuckDB query:
 
 ```
-select station, min(temp), max(temp), round(avg(temp), 1)
-from read_csv('/home/ben/h/1brc/data/measurements.txt', columns={'station': 'VARCHAR', 'temp': 'DOUBLE'})
-group by station
-order by station;
+SELECT station, min(temp), max(temp), round(avg(temp), 1)
+FROM read_csv('/home/ben/h/1brc/data/measurements.txt',
+              columns={'station': 'VARCHAR', 'temp': 'DOUBLE'})
+GROUP BY station
+ORDER BY station;
 ```
 
 ```
