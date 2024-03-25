@@ -5,8 +5,8 @@ This repo contains the source code for a talk I gave on Python performance at th
 Some of the solutions import [line_profiler](https://pypi.org/project/line-profiler/), so to run them, first set up a virtual environment and install that package:
 
 ```
-$ python3 -m venv venv       # create the virtual environment
-$ source venv/bin/activate   # active it
+$ python3 -m venv venv             # create the virtual environment
+$ source venv/bin/activate         # active it
 $ pip install -r requirements.txt  # install modules (line_profiler)
 ```
 
